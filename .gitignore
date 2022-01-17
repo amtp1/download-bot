@@ -1,0 +1,13 @@
+__pycache__
+
+bin/
+include/
+lib/
+lib64/
+share/
+
+debug/
+
+pyvenv.cfg
+db.sqlite3
+config.yaml
