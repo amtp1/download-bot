@@ -3,7 +3,7 @@ import urllib.request
 from pytube import YouTube
 
 def get_video():
-    yt = YouTube("https://www.youtube.com/watch?v=Vj4Y1c-DSM0")
+    yt = YouTube("<url>")
 
     stream = yt.streams.get_by_itag(22)
     video = urllib.request.urlopen(stream.url).read()
@@ -13,7 +13,7 @@ def create_db():
     cursor = sql.cursor()
 
     cursor.execute("""
-        CREATE TABLE users(id PRIMARY KEY,
+        CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             username VARCHAR(255) NULL,
             first_name VARCHAR(255) NULL,
