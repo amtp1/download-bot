@@ -12,23 +12,23 @@ from objects.globals import dp, bot
 from models.models import *
 from states.states import *
 
-SCHEME = ["https", "http"]
+SCHEME = ["https", "http"] # Scheme types.
 
 @dp.message_handler()
 async def download(message: Message, state: FSMContext):
-    print(message)
-    base_url: str = message.text
-    url = yarl.URL(base_url)
+    base_url: str = message.text # Set base url from message.
+    url: yarl.URL = yarl.URL(base_url) # Init URL class.
+    # Check scheme in url.
     if url.scheme in SCHEME:
         try:
-            yt = YouTube(base_url)
-            await state.update_data(url=base_url, video_id=yt.video_id)
+            yt = YouTube(base_url) # Init YouTube class.
+            await state.update_data(url=base_url, video_id=yt.video_id) # Set states (url and video id).
             inline_choose_type = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [InlineKeyboardButton(text="Audio", callback_data="audio")],
                     [InlineKeyboardButton(text="Video", callback_data="video")]
                 ])
-            return await message.answer(text="Select content type", reply_markup=inline_choose_type)
+            return await message.answer(text="Select content type", reply_markup=inline_choose_type) # Return message with choose type.
         except RegexMatchError:
             return await message.answer(text="Invalid link!")
         except Exception as e:
@@ -36,42 +36,40 @@ async def download(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(lambda query: query.data=="audio")
 async def download_audio(query: CallbackQuery, state: FSMContext):
-    content_data = await state.get_data()
-    yt: YouTube = YouTube(content_data.get("url"))
+    content_data: dict = await state.get_data() # Get state data.
+    yt: YouTube = YouTube(content_data.get("url")) # Init YouTube class.
     stream = yt.streams.filter(only_audio=True)[0]
-    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024)
-    str_filesize: str = "{:.2}".format(mb_size)
+    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024) # Convert to mb value size.
+    str_filesize: str = "{:.2}".format(mb_size) # Format in string file size.
     if mb_size > 50:
-        return await bot.send_message(chat_id=query.from_user.id, text=f"Audio size ({str_filesize})MB) large then 50MB")
+        return await bot.send_message(chat_id=query.from_user.id, text=f"Audio size ({str_filesize})MB) large then 50MB") # File size is larger.
     await bot.send_message(chat_id=query.from_user.id, text=f"⏳Downloading best audio ({str_filesize}MB)")
-    audio = urllib.request.urlopen(stream.url).read()
-    bytes_audio: BytesIO = BytesIO(audio)
-    user = await User.objects.get(user_id=query.from_user.id)
-    download_count: int = user.download_count + 1
-    await user.update(download_count=download_count)
-    #await bot.delete_message(query.from_user.id, query.message.message_id)
+    audio = urllib.request.urlopen(stream.url).read() # Read audio content.
+    bytes_audio: BytesIO = BytesIO(audio) # Convert audio content in bytes.
+    user = await User.objects.get(user_id=query.from_user.id) # Get user object.
+    download_count: int = user.download_count + 1 # Change count value.
+    await user.update(download_count=download_count) # Update count value in the database.
     return await bot.send_audio(
         query.from_user.id, InputFile(bytes_audio, filename=f"{yt.author} - {yt.title}"),
         caption=f"✅ <b>{yt.author}</b> - {yt.title}\n\n"
-        f"Channel: @downloader_video")
+        f"Channel: @downloader_video") # Return audio with description.
 
 @dp.callback_query_handler(lambda query: query.data=="video")
 async def download_video(query: CallbackQuery, state:FSMContext):
-    content_data = await state.get_data()
-    yt: YouTube = YouTube(content_data.get("url"))
+    content_data = await state.get_data() # Get state data.
+    yt: YouTube = YouTube(content_data.get("url")) # Init YouTube class.
     stream = yt.streams.filter(only_video=True)[0]
-    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024)
-    str_filesize: str = "{:.2}".format(mb_size)
+    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024) # Convert to mb value size.
+    str_filesize: str = "{:.2}".format(mb_size) # Format in string file size.
     if mb_size > 50:
-        return await bot.send_message(chat_id=query.from_user.id, text=f"Video size ({str_filesize})MB) large then 50MB")
+        return await bot.send_message(chat_id=query.from_user.id, text=f"Video size ({str_filesize})MB) large then 50MB") # File size is larger.
     await bot.send_message(chat_id=query.from_user.id, text=f"⏳Downloading best video ({str_filesize}MB)")
-    video = urllib.request.urlopen(stream.url).read()
-    bytes_video: BytesIO = BytesIO(video)
-    user = await User.objects.get(user_id=query.from_user.id)
-    download_count: int = user.download_count + 1
-    await user.update(download_count=download_count)
-    #await bot.delete_message(query.from_user.id, query.message.message_id)
+    video = urllib.request.urlopen(stream.url).read() # Read video content.
+    bytes_video: BytesIO = BytesIO(video) # Convert video content in bytes.
+    user = await User.objects.get(user_id=query.from_user.id) # Get user object.
+    download_count: int = user.download_count + 1 # Change count value.
+    await user.update(download_count=download_count) # Update count value in the database.
     return await bot.send_video(
         query.from_user.id, InputFile(bytes_video, filename=f"{yt.author} - {yt.title}"),
         caption=f"✅ <b>{yt.author}</b> - {yt.title}\n\n"
-        f"Channel: @downloader_video")
+        f"Channel: @downloader_video") # Return video with description.
