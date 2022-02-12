@@ -16,6 +16,7 @@ SCHEME = ["https", "http"]
 
 @dp.message_handler()
 async def download(message: Message, state: FSMContext):
+    print(message)
     base_url: str = message.text
     url = yarl.URL(base_url)
     if url.scheme in SCHEME:
@@ -48,7 +49,7 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
     user = await User.objects.get(user_id=query.from_user.id)
     download_count: int = user.download_count + 1
     await user.update(download_count=download_count)
-    await bot.delete_message(query.from_user.id, query.message.message_id)
+    #await bot.delete_message(query.from_user.id, query.message.message_id)
     return await bot.send_audio(
         query.from_user.id, InputFile(bytes_audio, filename=f"{yt.author} - {yt.title}"),
         caption=f"✅ <b>{yt.author}</b> - {yt.title}\n\n"
@@ -69,7 +70,7 @@ async def download_video(query: CallbackQuery, state:FSMContext):
     user = await User.objects.get(user_id=query.from_user.id)
     download_count: int = user.download_count + 1
     await user.update(download_count=download_count)
-    await bot.delete_message(query.from_user.id, query.message.message_id)
+    #await bot.delete_message(query.from_user.id, query.message.message_id)
     return await bot.send_video(
         query.from_user.id, InputFile(bytes_video, filename=f"{yt.author} - {yt.title}"),
         caption=f"✅ <b>{yt.author}</b> - {yt.title}\n\n"
