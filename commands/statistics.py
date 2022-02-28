@@ -8,7 +8,9 @@ from models.models import *
 async def statistics(message: Message):
     if int(config.get("ADMIN_ID")) == message.from_user.id:
         users = await User.objects.all()
+        download_count = await User.objects.count()
         stat_page: str = (f"<b>Statistics</b>\n"
-            f"<code>|--</code><i>Общее количество</i>: {users.__len__()}\n"
+            f"<code>|--</code><i>All users</i>: {users.__len__()}\n"
+            f"<code>|--</code><i>Download count</i>: {download_count}\n"
             )
         return await message.answer(text=stat_page)
