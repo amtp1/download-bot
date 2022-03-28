@@ -31,13 +31,15 @@ async def main():
         level="DEBUG", rotation="1 week",
         compression="zip")
 
+    """
     globals.db = Database(r"sqlite:///%s/db.sqlite3" % DB_PATH)
     globals.metadata = MetaData()
 
     globals.db_engine = create_engine(str(globals.db.url))
     globals.metadata.create_all(globals.db_engine)
+    """
 
-    globals.bot = Bot(token=globals.config["BOT_TOKEN"], parse_mode="HTML")
+    globals.bot = Bot(token=globals.config{"BOT_TOKEN"}, parse_mode="HTML")
     globals.dp = Dispatcher(globals.bot, storage=MemoryStorage())
 
     bot_info: dict = await globals.bot.get_me()
