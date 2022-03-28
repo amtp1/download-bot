@@ -39,7 +39,7 @@ async def main():
     globals.metadata.create_all(globals.db_engine)
     """
 
-    globals.bot = Bot(token=globals.config{"BOT_TOKEN"}, parse_mode="HTML")
+    globals.bot = Bot(token=globals.config["BOT_TOKEN"], parse_mode="HTML")
     globals.dp = Dispatcher(globals.bot, storage=MemoryStorage())
 
     bot_info: dict = await globals.bot.get_me()
