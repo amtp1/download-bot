@@ -1,4 +1,3 @@
-
 import urllib.request
 from io import BytesIO
 
@@ -25,10 +24,10 @@ async def download(message: Message, state: FSMContext):
             yt = YouTube(base_url) # Init YouTube class.
             await state.update_data(url=base_url, video_id=yt.video_id) # Set states (url and video id).
             inline_choose_type = InlineKeyboardMarkup(
-                inline_keyboard={
-                    {InlineKeyboardButton(text="Audio", callback_data="audio")},
-                    {InlineKeyboardButton(text="Video", callback_data="video")}
-                })
+                inline_keyboard=[
+                    [InlineKeyboardButton(text="Audio", callback_data="audio")],
+                    [InlineKeyboardButton(text="Video", callback_data="video")]
+                ])
             return await message.answer(text="Select content type", reply_markup=inline_choose_type) # Return message with choose type.
         except RegexMatchError:
             return await message.answer(text="Invalid link!")
