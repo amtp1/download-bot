@@ -55,8 +55,8 @@ async def download(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(lambda query: query.data=="audio")
 async def download_audio(query: CallbackQuery, state: FSMContext):
-    cht_id = query.from_user.id
-    msg_id = query.message.message_id
+    cht_id = query.from_user.id # Set user id.
+    msg_id = query.message.message_id # Set message id.
 
     content_data: dict = await state.get_data() # Get state data.
     response = yt_download(content_data.get("url"), is_audio=True)
@@ -69,17 +69,17 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
         bytes_audio: BytesIO = BytesIO(audio) # Convert audio content in bytes.
 
         # Update user download count.
-        update_download_count(query.from_user.id)
+        update_download_count(cht_id)
 
-        return await bot.send_audio(
-            query.from_user.id, InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
+        return await bot.send_audio(cht_id, 
+            InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
             caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
             f"Channel: @downloader_video") # Return audio with description.
 
 @dp.callback_query_handler(lambda query: query.data=="video")
 async def download_video(query: CallbackQuery, state:FSMContext):
-    cht_id = query.from_user.id
-    msg_id = query.message.message_id
+    cht_id = query.from_user.id # Set user id.
+    msg_id = query.message.message_id # Set message id.
 
     content_data = await state.get_data() # Get state data.
     response = yt_download(content_data.get("url"))
@@ -92,10 +92,10 @@ async def download_video(query: CallbackQuery, state:FSMContext):
         bytes_video: BytesIO = BytesIO(video) # Convert video content in bytes.
 
         # Update user download count.
-        update_download_count(query.from_user.id)
+        update_download_count(cht_id)
 
-        return await bot.send_video(
-            query.from_user.id, InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
+        return await bot.send_video(cht_id,
+            InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
             caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
             f"Channel: @downloader_video") # Return video with description.
 
@@ -110,7 +110,7 @@ def yt_download(url: str, is_audio: bool = False) -> dict:
         str_filesize: str = "{:.2}MB".format(mb_size) # Format in string file size.
     elif mb_size > 1024:
         _mb_size = mb_size / 1024
-        str_filesize: str = "{:.2}GB".format(_mb_size)
+        str_filesize: str = "{:.2}GB".format(_mb_size) # Format in string file size.
     if mb_size > 50:
         return MetaDownload(is_error=True, message=f"Video size ({str_filesize}) large then 50MB")
     else:
