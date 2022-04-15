@@ -82,6 +82,7 @@ async def download_video(query: CallbackQuery, state:FSMContext):
     msg_id = query.message.message_id # Set message id.
 
     content_data = await state.get_data() # Get state data.
+
     response = yt_download(content_data.get("url"))
 
     if response.is_error:
@@ -100,7 +101,11 @@ async def download_video(query: CallbackQuery, state:FSMContext):
             f"Channel: @downloader_video") # Return video with description.
 
 def yt_download(url: str, is_audio: bool = False) -> dict:
-    yt: YouTube = YouTube(url) # Init YouTube class.
+    try:
+        yt: YouTube = YouTube(url) # Init YouTube class.
+    except TypeError:
+        return MetaDownload(is_error=True, message=f"Paste new link")
+        
     if is_audio:
         stream = yt.streams.filter(only_audio=is_audio)[0]
     else:
