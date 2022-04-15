@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 
 from aiogram.types import Message
+from aiogram.utils.exceptions import ChatNotFound, UserDeactivated, BotBlocked
 from aiogram.dispatcher.storage import FSMContext
 
 from objects import globals
@@ -24,7 +25,10 @@ async def condunt_mailing(message: Message, state: FSMContext):
     users = User.objects.all()
     start_time = dt.now()
     for user in users:
-        await globals.bot.send_message(user.user_id, message.text)
+        try:
+            await globals.bot.send_message(user.user_id, message.text)
+        except (BotBlocked, UserDeactivated, ChatNotFound):
+            pass
     end_time = dt.now()
     total_sec = (end_time - start_time).total_seconds()
     globals.is_mailing = False
