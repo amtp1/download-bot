@@ -1,9 +1,13 @@
 from models.mongo.models import *
 
+bot = None
+
 metadata = None
 db_engine = None
 
 config: dict = {}
+
+is_mailing: bool = False
 
 def update_download_count(user_id: int):
     user = User.objects(user_id=user_id).first()
