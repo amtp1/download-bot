@@ -12,7 +12,7 @@ async def statistics(message: Message):
         mail_markup = ReplyKeyboardMarkup(resize_keyboard=True,
             keyboard=[
                 [KeyboardButton(text="Conduct mailing")]
-        ])
+            ])
         stat_page: str = (f"<b>Statistics</b>\n"
             f"<code>|--</code><i>All users</i>: {users.__len__()}\n"
             f"<code>|--</code><i>Download count</i>: {download_count}\n"
