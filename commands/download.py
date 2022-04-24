@@ -77,7 +77,7 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
             f"Channel: @downloader_video") # Return audio with description.
 
 @dp.callback_query_handler(lambda query: query.data=="video")
-async def download_video(query: CallbackQuery, state:FSMContext):
+async def download_video(query: CallbackQuery, state: FSMContext):
     cht_id = query.from_user.id # Set user id.
     msg_id = query.message.message_id # Set message id.
 
