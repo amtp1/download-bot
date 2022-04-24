@@ -6,7 +6,7 @@ connect("download_bot")
 
 
 class CommonQuerySet(QuerySet):
-    def update_by_user_id(self, user_id: str, fields: dict):
+    def update(self, user_id: str, fields: dict):
         update_document = self.filter(user_id=user_id).modify(
             new=True, **fields
         )
