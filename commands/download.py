@@ -1,3 +1,4 @@
+import traceback
 import urllib.request
 from io import BytesIO
 
@@ -83,12 +84,15 @@ async def download_video(query: CallbackQuery, state: FSMContext):
 
     content_data = await state.get_data() # Get state data.
 
+    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
+
     response = yt_download(content_data.get("url"))
+    await bot.send_chat_action(chat_id=cht_id, action="upload_video")
 
     if response.is_error:
         return await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=response.message)
     else:
-        await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
+        #await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
         video = urllib.request.urlopen(response.stream).read() # Read video content.
         bytes_video: BytesIO = BytesIO(video) # Convert video content in bytes.
 
@@ -107,9 +111,17 @@ def yt_download(url: str, is_audio: bool = False) -> dict:
         return MetaDownload(is_error=True, message=f"Paste new link")
         
     if is_audio:
-        stream = yt.streams.filter(only_audio=is_audio)[0]
+        try:
+            stream = yt.streams.filter(only_audio=is_audio)[0]
+        except:
+            traceback.print_exc()
+            return MetaDownload(is_error=True, message=f"Unknow error")
     else:
-        stream = yt.streams.filter(only_video=True)[0]
+        try:
+            stream = yt.streams.filter(only_video=True)[0]
+        except:
+            traceback.print_exc()
+            return MetaDownload(is_error=True, message=f"Unknow error")
     mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024) # Convert to mb value size.
     if mb_size < 1024:
         str_filesize: str = "{:.2}MB".format(mb_size) # Format in string file size.
