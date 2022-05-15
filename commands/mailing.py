@@ -28,7 +28,7 @@ async def condunt_mailing(message: Message, state: FSMContext):
         try:
             await globals.bot.send_message(user.user_id, message.text)
         except (BotBlocked, UserDeactivated, ChatNotFound):
-            pass
+            globals.update_blocked_status(user.user_id)
     end_time = dt.now()
     total_sec = (end_time - start_time).total_seconds()
     globals.is_mailing = False
