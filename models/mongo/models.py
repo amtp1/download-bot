@@ -22,4 +22,5 @@ class User(Document):
     last_name = StringField(max_length=255, default=None)
     date_joined = DateTimeField(default=dt.utcnow)
     download_count = IntField(default=0)
+    is_blocked = BooleanField(default=False)
     meta = {"queryset_class": CommonQuerySet}
