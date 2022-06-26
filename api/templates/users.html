@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title%}Пользователи{% endblock %}
+
+{% block body %}
+{% if users %}
+<p><div class="col-sm">
+  <p><input  type="text" id="SearchUserInput" onkeyup="searchUserById()" placeholder="Input User Id"></p>
+</div>
+</p>
+<div id="UsersTable" class="table-wrapper-scroll-y">
+    <table class="table table-sm">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">User Id</th>
+          <th scope="col">Username</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col" >Download Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{user.user_id}}</td>
+            <td><strong>{{user.username}}</strong></td>
+            <td>{{user.first_name}}</td>
+            <td>{{user.last_name}}</td>
+            <td><strong>{{user.download_count}}</strong></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <h1>Пользователи не найдены</h1>
+  {% endif %}
+{% endblock %}
