@@ -1,6 +1,9 @@
+from aiogram import Dispatcher, Bot
+
 from models.mongo.models import *
 
-bot = None
+bot: Bot = None
+dp: Dispatcher = None
 
 metadata = None
 db_engine = None
