@@ -6,7 +6,7 @@ import yarl
 from loguru import logger
 from pytube import YouTube
 from dataclasses import dataclass
-from pytube.exceptions import RegexMatchError
+from pytube.exceptions import RegexMatchError, VideoUnavailable
 from aiogram.dispatcher.storage import FSMContext
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 
@@ -119,6 +119,8 @@ def yt_download(url: str, is_audio: bool = False) -> dict:
     else:
         try:
             stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+        except VideoUnavailable as e:
+            return MetaDownload(is_error=True, message=e)
         except:
             traceback.print_exc()
             return MetaDownload(is_error=True, message=f"Unknow error")
