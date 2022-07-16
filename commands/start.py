@@ -1,4 +1,4 @@
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 
 from models.mongo.models import *
 from objects.globals import dp
@@ -10,4 +10,8 @@ async def start(message: Message):
         user = User(user_id=message.from_user.id, username=message.from_user.username,
             first_name=message.from_user.first_name, last_name=message.from_user.last_name)
         user.save()
-    return await message.answer(text="Paste link (YouTube):")
+    reply_markup = ReplyKeyboardMarkup(resize_keyboard=True,
+        keyboard=[
+            [KeyboardButton(text="❗️Help")]
+        ])
+    return await message.answer(text="Paste link (YouTube):", reply_markup=reply_markup)
