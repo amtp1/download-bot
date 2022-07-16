@@ -65,7 +65,7 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
     if response.is_error:
         return await bot.send_message(chat_id=cht_id, text=response.message)
     else:
-        await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best audio")
+        await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best audio. Please, wait.")
         audio = urllib.request.urlopen(response.stream).read() # Read audio content.
         bytes_audio: BytesIO = BytesIO(audio) # Convert audio content in bytes.
 
@@ -84,7 +84,7 @@ async def download_video(query: CallbackQuery, state: FSMContext):
 
     content_data = await state.get_data() # Get state data.
 
-    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
+    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video. Please, wait.")
 
     response = yt_download(content_data.get("url"))
     await bot.send_chat_action(chat_id=cht_id, action="upload_video")
@@ -112,13 +112,13 @@ def yt_download(url: str, is_audio: bool = False) -> dict:
         
     if is_audio:
         try:
-            stream = yt.streams.filter(only_audio=is_audio)[0]
+            stream = yt.streams.filter(only_audio=True).desc().first()
         except:
             traceback.print_exc()
             return MetaDownload(is_error=True, message=f"Unknow error")
     else:
         try:
-            stream = yt.streams.filter(only_video=True)[0]
+            stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
         except:
             traceback.print_exc()
             return MetaDownload(is_error=True, message=f"Unknow error")
