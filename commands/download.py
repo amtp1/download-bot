@@ -1,3 +1,4 @@
+import re
 import traceback
 import urllib.request
 from io import BytesIO
@@ -14,7 +15,7 @@ from objects.globals import dp, bot, update_download_count
 from models.mongo.models import *
 from states.states import *
 
-SCHEME = {"https", "http"} # Scheme types.
+SCHEME = {"https", "http"}  # Scheme types.
 
 
 @dataclass
@@ -36,80 +37,112 @@ class MetaDownload:
 
 @dp.message_handler()
 async def download(message: Message, state: FSMContext):
-    base_url: str = message.text # Set base url from message.
-    url: yarl.URL = yarl.URL(base_url) # Init URL class.
+    base_url: str = message.text  # Set base url from message.
+    url: yarl.URL = yarl.URL(base_url)  # Init URL class.
     # Check scheme in url.
     if url.scheme in SCHEME:
         try:
-            yt = YouTube(base_url) # Init YouTube class.
-            await state.update_data(url=base_url, video_id=yt.video_id) # Set states (url and video id).
+            yt = YouTube(base_url)  # Init YouTube class.
+            # Set states (url and video id).
+            await state.update_data(url=base_url, video_id=yt.video_id)
             inline_choose_type = InlineKeyboardMarkup(
                 inline_keyboard=[
-                    [InlineKeyboardButton(text="Audio", callback_data="audio")],
+                    [InlineKeyboardButton(
+                        text="Audio", callback_data="audio")],
                     [InlineKeyboardButton(text="Video", callback_data="video")]
                 ])
-            return await message.answer(text="Select content type", reply_markup=inline_choose_type) # Return message with choose type.
+            # Return message with choose type.
+            return await message.answer(text="Select content type", reply_markup=inline_choose_type)
         except RegexMatchError:
             return await message.answer(text="Invalid link!")
         except Exception as e:
             logger.error(e)
 
-@dp.callback_query_handler(lambda query: query.data=="audio")
-async def download_audio(query: CallbackQuery, state: FSMContext):
-    cht_id = query.from_user.id # Set user id.
-    msg_id = query.message.message_id # Set message id.
 
-    content_data: dict = await state.get_data() # Get state data.
+@dp.callback_query_handler(lambda query: query.data == "audio")
+async def download_audio(query: CallbackQuery, state: FSMContext):
+    cht_id = query.from_user.id  # Set user id.
+    msg_id = query.message.message_id  # Set message id.
+
+    content_data: dict = await state.get_data()  # Get state data.
     response = yt_download(content_data.get("url"), is_audio=True)
-    
+
     if response.is_error:
         return await bot.send_message(chat_id=cht_id, text=response.message)
     else:
         await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best audio. Please, wait.")
-        audio = urllib.request.urlopen(response.stream).read() # Read audio content.
-        bytes_audio: BytesIO = BytesIO(audio) # Convert audio content in bytes.
+        # Read audio content.
+        audio = urllib.request.urlopen(response.stream).read()
+        # Convert audio content in bytes.
+        bytes_audio: BytesIO = BytesIO(audio)
 
         # Update user download count.
         update_download_count(cht_id)
 
-        return await bot.send_audio(cht_id, 
-            InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
-            caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-            f"Channel: @downloader_video") # Return audio with description.
+        return await bot.send_audio(cht_id,
+                                    InputFile(
+                                        bytes_audio, filename=f"{response.author} - {response.title}"),
+                                    caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
+                                    f"Channel: @downloader_video")  # Return audio with description.
 
-@dp.callback_query_handler(lambda query: query.data=="video")
+
+@dp.callback_query_handler(lambda query: query.data == "video")
 async def download_video(query: CallbackQuery, state: FSMContext):
-    cht_id = query.from_user.id # Set user id.
-    msg_id = query.message.message_id # Set message id.
+    cht_id = query.from_user.id  # Set user id.
+    msg_id = query.message.message_id  # Set message id.
 
-    content_data = await state.get_data() # Get state data.
+    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Formatting streams. Please, wait...")
 
-    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video. Please, wait.")
+    content_data = await state.get_data()  # Get state data.
+    yt = YouTube(content_data.get("url"))
+    streams = list(yt.streams.filter(
+        progressive=True, file_extension='mp4'))[::-1]
 
-    response = yt_download(content_data.get("url"))
+    streams_markup = InlineKeyboardMarkup()
+    for stream in streams:
+        streams_markup.add(InlineKeyboardButton(
+            text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
+    return await query.message.answer("Select stream", reply_markup=streams_markup)
+
+
+@dp.callback_query_handler(lambda query: query.data.startswith("stream"))
+async def download_by_select_stream(query: CallbackQuery, state: FSMContext):
+    cht_id = query.from_user.id  # Set user id.
+    msg_id = query.message.message_id  # Set message id.
+
+    await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video. Please, wait...")
+
+    itag = re.sub("stream#", "", query.data)
+    content_data = await state.get_data()  # Get state data.
+
+    response = yt_download(content_data.get("url"), itag=itag)
     await bot.send_chat_action(chat_id=cht_id, action="upload_video")
 
     if response.is_error:
         return await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=response.message)
     else:
-        #await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
-        video = urllib.request.urlopen(response.stream).read() # Read video content.
-        bytes_video: BytesIO = BytesIO(video) # Convert video content in bytes.
+        # await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best video")
+        # Read video content.
+        video = urllib.request.urlopen(response.stream).read()
+        # Convert video content in bytes.
+        bytes_video: BytesIO = BytesIO(video)
 
         # Update user download count.
         update_download_count(cht_id)
 
         return await bot.send_video(cht_id,
-            InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
-            caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-            f"Channel: @downloader_video") # Return video with description.
+                                    InputFile(
+                                        bytes_video, filename=f"{response.author} - {response.title}"),
+                                    caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
+                                    f"Channel: @downloader_video")  # Return video with description.
 
-def yt_download(url: str, is_audio: bool = False) -> dict:
+
+def yt_download(url: str, is_audio: bool = False, itag: int = None) -> dict:
     try:
-        yt: YouTube = YouTube(url) # Init YouTube class.
+        yt: YouTube = YouTube(url)  # Init YouTube class.
     except TypeError:
         return MetaDownload(is_error=True, message=f"Paste new link")
-        
+
     if is_audio:
         try:
             stream = yt.streams.filter(only_audio=True).desc().first()
@@ -118,18 +151,21 @@ def yt_download(url: str, is_audio: bool = False) -> dict:
             return MetaDownload(is_error=True, message=f"Unknow error")
     else:
         try:
-            stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+            stream = yt.streams.get_by_itag(itag)
         except VideoUnavailable as e:
             return MetaDownload(is_error=True, message=e)
         except:
             traceback.print_exc()
             return MetaDownload(is_error=True, message=f"Unknow error")
-    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024) # Convert to mb value size.
+    # Convert to mb value size.
+    mb_size: float = float(stream.filesize / 8 / 8 / 16 / 1024)
     if mb_size < 1024:
-        str_filesize: str = "{:.2}MB".format(mb_size) # Format in string file size.
+        # Format in string file size.
+        str_filesize: str = "{:.2}MB".format(mb_size)
     elif mb_size > 1024:
         _mb_size = mb_size / 1024
-        str_filesize: str = "{:.2}GB".format(_mb_size) # Format in string file size.
+        # Format in string file size.
+        str_filesize: str = "{:.2}GB".format(_mb_size)
     if mb_size > 50:
         return MetaDownload(is_error=True, message=f"Video size ({str_filesize}) large then 50MB")
     else:

@@ -15,6 +15,7 @@ class CommonQuerySet(QuerySet):
             raise ("Wrong user id =>", user_id)
         return update_document
 
+
 class User(Document):
     user_id = IntField()
     username = StringField(max_length=255, default=None)

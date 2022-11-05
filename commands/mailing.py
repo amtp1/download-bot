@@ -8,13 +8,16 @@ from objects import globals
 from states.states import Mailing
 from models.mongo.models import *
 
+
 @globals.dp.message_handler(lambda message: message.text == "Conduct mailing")
 async def get_mailing_content(message: Message):
-    if globals.is_mailing:
-        return await message.answer("Mailing now ...")
+    if globals.config.get("ADMIN_ID") == message.from_user.id:
+        if globals.is_mailing:
+            return await message.answer("Mailing now ...")
 
-    await message.answer("Enter message [/start - Cancel]:")
-    await Mailing.condunt_mailing.set()
+        await message.answer("Enter message [/start - Cancel]:")
+        await Mailing.condunt_mailing.set()
+
 
 @globals.dp.message_handler(state=Mailing.condunt_mailing)
 async def condunt_mailing(message: Message, state: FSMContext):
