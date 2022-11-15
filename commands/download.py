@@ -38,25 +38,32 @@ class MetaDownload:
 @dp.message_handler()
 async def download(message: Message, state: FSMContext):
     base_url: str = message.text  # Set base url from message.
-    url: yarl.URL = yarl.URL(base_url)  # Init URL class.
-    # Check scheme in url.
-    if url.scheme in SCHEME:
-        try:
-            yt = YouTube(base_url)  # Init YouTube class.
-            # Set states (url and video id).
-            await state.update_data(url=base_url, video_id=yt.video_id)
-            inline_choose_type = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(
-                        text="Audio", callback_data="audio")],
-                    [InlineKeyboardButton(text="Video", callback_data="video")]
-                ])
-            # Return message with choose type.
-            return await message.answer(text="Select content type", reply_markup=inline_choose_type)
-        except RegexMatchError:
-            return await message.answer(text="Invalid link!")
-        except Exception as e:
-            logger.error(e)
+    youtube_regex = (
+        r'(https?://)?(www\.)?'
+        '(youtube|youtu|youtube-nocookie)\.(com|be)/'
+        '(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})')
+
+    youtube_regex_match = re.match(youtube_regex, base_url)
+    if youtube_regex_match:
+        url: yarl.URL = yarl.URL(base_url)  # Init URL class.
+        # Check scheme in url.
+        if url.scheme in SCHEME:
+            try:
+                yt = YouTube(base_url)  # Init YouTube class.
+                # Set states (url and video id).
+                await state.update_data(url=base_url, video_id=yt.video_id)
+                inline_choose_type = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [InlineKeyboardButton(
+                            text="Audio", callback_data="audio")],
+                        [InlineKeyboardButton(text="Video", callback_data="video")]
+                    ])
+                # Return message with choose type.
+                return await message.answer(text="Select content type", reply_markup=inline_choose_type)
+            except RegexMatchError:
+                return await message.answer(text="Invalid link!")
+            except Exception as e:
+                logger.error(e)
 
 
 @dp.callback_query_handler(lambda query: query.data == "audio")
@@ -95,14 +102,17 @@ async def download_video(query: CallbackQuery, state: FSMContext):
 
     content_data = await state.get_data()  # Get state data.
     yt = YouTube(content_data.get("url"))
-    streams = list(yt.streams.filter(
-        progressive=True, file_extension='mp4'))[::-1]
+    try:
+        streams = list(yt.streams.filter(
+            progressive=True, file_extension='mp4'))[::-1]
 
-    streams_markup = InlineKeyboardMarkup()
-    for stream in streams:
-        streams_markup.add(InlineKeyboardButton(
-            text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
-    return await query.message.answer("Select stream", reply_markup=streams_markup)
+        streams_markup = InlineKeyboardMarkup()
+        for stream in streams:
+            streams_markup.add(InlineKeyboardButton(
+                text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
+        return await query.message.answer("Select stream", reply_markup=streams_markup)
+    except VideoUnavailable:
+        return await query.message.answer(text="Video unavailable!")
 
 
 @dp.callback_query_handler(lambda query: query.data.startswith("stream"))
