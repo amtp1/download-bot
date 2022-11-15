@@ -6,7 +6,7 @@ from models.mongo.models import *
 
 @dp.message_handler(commands=["stat"])
 async def statistics(message: Message):
-    if int(config.get("ADMIN_ID")) == message.from_user.id:
+    if config.get("ADMIN_ID") == message.from_user.id:
         users = User.objects.all()  # Get all users.
         blocked_users = User.objects.filter(is_blocked=True).all()
         # Sum count of downdloads.
