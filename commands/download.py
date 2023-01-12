@@ -40,11 +40,15 @@ async def download(message: Message, state: FSMContext):
     base_url: str = message.text  # Set base url from message.
     youtube_regex = (
         r'(https?://)?(www\.)?'
-        '(youtube|youtu|youtube-nocookie)\.(com|be)/'
-        '(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})')
+        r'(youtube|youtu|youtube-nocookie|music.youtube)\.(com|be)/'
+        r'(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})')
+    instagram_regex = (
+        r'(https?://)?(www\.)?'
+        r'(instagram|insta)\.(com)/')
 
-    youtube_regex_match = re.match(youtube_regex, base_url)
-    if youtube_regex_match:
+    youtube_regex = re.match(youtube_regex, base_url)
+    instagram_regex = re.match(instagram_regex, base_url)
+    if youtube_regex:
         url: yarl.URL = yarl.URL(base_url)  # Init URL class.
         # Check scheme in url.
         if url.scheme in SCHEME:
@@ -64,6 +68,9 @@ async def download(message: Message, state: FSMContext):
                 return await message.answer(text="Invalid link!")
             except Exception as e:
                 logger.error(e)
+    elif instagram_regex:
+        return await message.answer("Soon to the moon!")
+
 
 
 @dp.callback_query_handler(lambda query: query.data == "audio")
@@ -77,7 +84,9 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
     if response.is_error:
         return await bot.send_message(chat_id=cht_id, text=response.message)
     else:
-        await bot.edit_message_text(chat_id=cht_id, message_id=msg_id, text=f"⏳Downloading best audio. Please, wait.")
+        await bot.edit_message_text(chat_id=cht_id, message_id=msg_id,
+                                    text="⏳Downloading best audio. Please, wait.\n"
+                                         "⚠️If the file size is large, the download will take longer.")
         # Read audio content.
         audio = urllib.request.urlopen(response.stream).read()
         # Convert audio content in bytes.
