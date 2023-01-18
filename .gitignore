@@ -12,3 +12,4 @@ debug/
 pyvenv.cfg
 db.sqlite3
 config.yaml
+.proxy_env
