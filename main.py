@@ -22,10 +22,10 @@ async def main():
         with open(r"%s/config.yaml" % CONFIG_PATH) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
             globals.config = config
-    
+
     # Debug
-    if not Path(DEBUG_DIRNAME ).exists():
-        mkdir(DEBUG_DIRNAME )
+    if not Path(DEBUG_DIRNAME).exists():
+        mkdir(DEBUG_DIRNAME)
     logger.add(
         r"%s/debug.log" % DEBUG_DIRNAME, format="{time} {level} {message}",
         level="DEBUG", rotation="1 week",
