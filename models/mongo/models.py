@@ -25,3 +25,11 @@ class User(Document):
     download_count = IntField(default=0)
     is_blocked = BooleanField(default=False)
     meta = {"queryset_class": CommonQuerySet}
+
+
+class Download(Document):
+    user = ReferenceField(User)
+    link = URLField()
+    content_type = StringField(max_length=128)
+    service = StringField(max_length=128)
+    created = DateTimeField(default=dt.utcnow)
