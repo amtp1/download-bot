@@ -9,8 +9,9 @@ async def statistics(message: Message):
     if config.get("ADMIN_ID") == message.from_user.id:
         users = User.objects.all()  # Get all users.
         blocked_users = User.objects.filter(is_blocked=True).all()
+        downloads = Download.objects.all()
         # Sum count of downdloads.
-        download_count = sum(list(obj.download_count for obj in users))
+        download_count = sum(list(obj.download_count for obj in users)) + len(downloads)
         mail_markup = ReplyKeyboardMarkup(resize_keyboard=True,
                                           keyboard=[
                                               [KeyboardButton(
