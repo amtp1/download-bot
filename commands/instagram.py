@@ -17,7 +17,8 @@ async def download(message: Message, state: FSMContext):
 
 
 @dp.message_handler(state='get_username')
-async def get_username(message: Message, n=0):
+async def get_username(message: Message, state: FSMContext, n=0):
+    await state.finish()
     username = message.text
     instagram_downloader = InstagramDownloader(username)
     stories = instagram_downloader.stories()
