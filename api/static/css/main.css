@@ -26,3 +26,17 @@
 #downloadsContainer {
   margin-top: -100px;
 }
+
+.my-custom-scrollbar {
+  max-height: 88vh;
+  overflow: auto;
+}
+
+.my-custom-scrollbar::-webkit-scrollbar{
+  width: 6px;
+  background-color: #F5F5F5;
+}
+
+.my-custom-scrollbar::-webkit-scrollbar-thumb{
+  background-color: #000000;
+}
