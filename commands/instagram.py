@@ -39,5 +39,5 @@ async def get_username(message: Message, state: FSMContext, n=0):
                 b_photo: BytesIO = BytesIO(photo)
                 await bot.send_photo(message.from_user.id, photo=b_photo, caption=f"Photo ID: {content_id}")
     user = User.objects.get(user_id=message.from_user.id)
-    download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="audio", service="youtube")
+    download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story", service="youtube")
     download.save()
