@@ -45,6 +45,20 @@ class User(Document):
             download_count=self.download_count
             )
 
+class Download(Document):
+    user = ReferenceField(User)
+    link = URLField()
+    content_type = StringField(max_length=128)
+    service = StringField(max_length=128)
+    created = DateTimeField(default=dt.utcnow)
+
+    def serialize(self):
+        return dict(
+            id=str(self.id), user_id=self.user.user_id,
+            link=self.link, content_type=self.content_type,
+            service=self.service, created=self.created
+            )
+
 class DesktopSession(Document):
     session_id = StringField(unique=True, max_length=255, default=str(uuid4()))
     user_email = StringField(max_length=255, default=None)
