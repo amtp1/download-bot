@@ -1,0 +1,40 @@
+{% extends 'base.html'%}
+{% block title %}Скачивания{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="center">
+        <h6 class="text-center">Count downloads: {{downloads|length}}</h6>
+        <p><div class="col-sm">
+            <p><input  type="text" id="SearchDownloadInput" onkeyup="searchDownloadByUserId()" placeholder="Input User Id"></p>
+          </div>
+        </p>
+    </div>
+</div>
+<div id="downloadsContainer" class="container">
+    <div class="center">
+        <div class="card" style="width: 15rem;">
+            <ul id="downloadsUl" class="list-group list-group-flush">
+                {% for download in downloads %}
+                    <li class="list-group-item text-center">
+                        {{download.user_id}}
+                        <a href="{{download.link}}"><i class="bi bi-box-arrow-up-right"></i></a>
+                        {% if download.content_type == 'video' %}
+                            <i class="bi bi-file-earmark-play"></i>
+                        {% elif download.content_type == 'audio' %}
+                            <i class="bi bi-file-earmark-music"></i>
+                        {% elif download.content_type == 'story' %}
+                            <i class="bi bi-camera"></i>
+                        {% endif %}
+                        {% if download.service == 'youtube' %}
+                            <i class="bi bi-youtube"></i>
+                        {% elif download.service == 'instagram' %}
+                            <i class="bi bi-instagram"></i>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
