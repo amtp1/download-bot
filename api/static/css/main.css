@@ -23,10 +23,6 @@
     transform: translate(-50%, -50%);
   }
 
-#downloadsContainer {
-  margin-top: -100px;
-}
-
 .my-custom-scrollbar {
   max-height: 88vh;
   overflow: auto;
