@@ -23,22 +23,23 @@ async def get_username(message: Message, state: FSMContext, n=0):
     username = message.text
     instagram_downloader = InstagramDownloader(username)
     stories = instagram_downloader.stories()
-    proxies = instagram_downloader.get_proxies()
-    for story in stories:
-        n+=1
-        if n % 2 == 0:
-            content_id, content_type, url = story.get('id'), story.get('type'), story.get('url')
-            f_url = re.sub('/api/proxy/', '', url)
-            if content_type == "photo":
-                #photo = requests.get(url=f_url, stream=True).content
-                proxy_handler = urllib.request.ProxyHandler(proxies)
-                opener = urllib.request.build_opener(proxy_handler)
-                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                urllib.request.install_opener(opener)
-                photo = urllib.request.urlopen(f_url).read()
-                b_photo: BytesIO = BytesIO(photo)
-                await bot.send_photo(message.from_user.id, photo=b_photo, caption=f"Photo ID: {content_id}")
-    user = User.objects.get(user_id=message.from_user.id)
-    download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
-                        service="instagram")
-    download.save()
+    if stories:
+        proxies = instagram_downloader.get_proxies()
+        for story in stories:
+            n+=1
+            if n % 2 == 0:
+                content_id, content_type, url = story.get('id'), story.get('type'), story.get('url')
+                f_url = re.sub('/api/proxy/', '', url)
+                if content_type == "photo":
+                    #photo = requests.get(url=f_url, stream=True).content
+                    proxy_handler = urllib.request.ProxyHandler(proxies)
+                    opener = urllib.request.build_opener(proxy_handler)
+                    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                    urllib.request.install_opener(opener)
+                    photo = urllib.request.urlopen(f_url).read()
+                    b_photo: BytesIO = BytesIO(photo)
+                    await bot.send_photo(message.from_user.id, photo=b_photo, caption=f"Photo ID: {content_id}")
+        user = User.objects.get(user_id=message.from_user.id)
+        download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
+                            service="instagram")
+        download.save()
