@@ -4,7 +4,11 @@
 {% block body %}
 <div class="container">
     <div class="center">
-        <button type="button" class="btn btn-primary" onclick="redirect_to_users()">Перейти к пользователям<i class="bi bi-arrow-right"></i></button>
+        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+            <button type="button" class="btn btn-primary" onclick="redirect_to_users()">Перейти к пользователям</button>
+            <br>
+            <button type="button" class="btn btn-primary" onclick="redirect_to_downloads()">Перейти к скачиваниям</button>
+        </div>
     </div>
 </div>
 {% endblock %}
