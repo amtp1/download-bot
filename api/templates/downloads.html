@@ -2,13 +2,17 @@
 {% block title %}Скачивания{% endblock %}
 
 {% block body %}
-<div id="downloadsContainer" class="container">
+<div class="container">
     <div class="center">
         <h6 class="text-center">Count downloads: {{downloads|length}}</h6>
         <p><div class="col-sm">
             <p><input  type="text" id="SearchDownloadInput" onkeyup="searchDownloadByUserId()" placeholder="Input User Id"></p>
             </div>
         </p>
+    </div>
+</div>
+<div id="downloadsContainer" class="container">
+    <div class="center">
         <div class="card" style="width: 15rem;">
             <ul id="downloadsUl" class="list-group list-group-flush my-custom-scrollbar">
                 {% for download in downloads %}

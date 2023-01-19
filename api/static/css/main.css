@@ -23,6 +23,14 @@
     transform: translate(-50%, -50%);
   }
 
+#downloadsContainer {
+  margin-top: 130px;
+}
+
+.card {
+  height: 530px;
+}
+
 .my-custom-scrollbar {
   max-height: 88vh;
   overflow: auto;
