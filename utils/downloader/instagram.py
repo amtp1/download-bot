@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 import random
 from dataclasses import dataclass
 
@@ -33,7 +34,10 @@ class InstagramDownloader:
         request = requests.get(url=link)
         response = request.text
         if response:
-            response = json.loads(response)
+            try:
+                response = json.loads(response)
+            except JSONDecodeError:
+                return None
         return response
 
     def get_proxies(self):
