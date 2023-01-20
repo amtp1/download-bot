@@ -45,5 +45,5 @@ async def get_username(message: Message, state: FSMContext, n=0):
         download.save()
     elif stories == []:
         return await message.answer("Stories is not found :(")
-    elif stories == None:
+    elif stories is None:
         return await message.answer("User is not found :(")
