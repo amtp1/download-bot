@@ -31,7 +31,6 @@ async def get_username(message: Message, state: FSMContext, n=0):
                 content_id, content_type, url = story.get('id'), story.get('type'), story.get('url')
                 f_url = re.sub('/api/proxy/', '', url)
                 if content_type == "photo":
-                    #photo = requests.get(url=f_url, stream=True).content
                     proxy_handler = urllib.request.ProxyHandler(proxies)
                     opener = urllib.request.build_opener(proxy_handler)
                     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
@@ -43,3 +42,5 @@ async def get_username(message: Message, state: FSMContext, n=0):
         download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
                             service="instagram")
         download.save()
+    else:
+        return await message.answer("User is not found :(")
