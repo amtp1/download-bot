@@ -10,7 +10,8 @@ from dotenv import dotenv_values
 
 config = dict(dotenv_values('.proxy_env'))
 PROXIES = list(dotenv_values('.proxies'))
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
+headers = {'User-Agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36')}
 
 MULTI_PROXY = False
 
@@ -32,13 +33,12 @@ class InstagramDownloader:
     def stories(self):
         link = 'https://instastories.watch/api/profile/stories?username=%s' % self.username
         request = requests.get(url=link)
-        response = request.text
-        if response:
-            try:
-                response = json.loads(response)
-            except JSONDecodeError:
-                return None
-        return response
+        try:
+            response = request.text
+            response = json.loads(response)
+            return response
+        except JSONDecodeError:
+            return None
 
     def get_proxies(self):
         if MULTI_PROXY:
