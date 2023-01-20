@@ -17,4 +17,4 @@ async def start(message: Message):
     start_markup = copy.deepcopy(START_MARKUP)
     if config.get("ADMIN_ID") == message.from_user.id:
         start_markup.add(KeyboardButton("Conduct mailing"))
-    return await message.answer(text="Paste link (YouTube):", reply_markup=start_markup)
+    return await message.answer(text="Select an option👇", reply_markup=start_markup)
