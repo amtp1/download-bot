@@ -4,9 +4,9 @@ import random
 from dataclasses import dataclass
 
 import requests
-from requests.exceptions import HTTPError, ProxyError, ConnectTimeout, SSLError, ConnectionError
-from loguru import logger
 from dotenv import dotenv_values
+
+from exceptions.exceptions import UserNotFound, NetworkError
 
 config = dict(dotenv_values('.proxy_env'))
 PROXIES = list(dotenv_values('.proxies'))
@@ -33,12 +33,16 @@ class InstagramDownloader:
     def stories(self):
         link = 'https://instastories.watch/api/profile/stories?username=%s' % self.username
         request = requests.get(url=link)
-        try:
-            response = request.text
-            response = json.loads(response)
-            return response
-        except JSONDecodeError:
-            return None
+        print(request.text)
+        if request.status_code == 200:
+            try:
+                response = request.text
+                response = json.loads(response)
+                return response
+            except JSONDecodeError:
+                raise UserNotFound('User not found')
+        else:
+            raise NetworkError('Network error')
 
     def get_proxies(self):
         if MULTI_PROXY:
