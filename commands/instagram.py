@@ -2,8 +2,7 @@ import re
 import urllib.request
 from io import BytesIO
 
-import requests
-from aiogram.types import Message
+from aiogram.types import Message, InputFile
 from aiogram.dispatcher.storage import FSMContext
 
 from objects.globals import dp, bot
@@ -35,13 +34,13 @@ async def get_username(message: Message, state: FSMContext, n=0):
                     f_url = re.sub('/api/proxy/', '', url)
                     f_content_id = content_id.split('-')[0]
                     if content_type == "photo":
-                        proxy_handler = urllib.request.ProxyHandler(proxies)
-                        opener = urllib.request.build_opener(proxy_handler)
-                        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                        urllib.request.install_opener(opener)
-                        photo = urllib.request.urlopen(f_url).read()
-                        b_photo: BytesIO = BytesIO(photo)
-                        await bot.send_photo(message.from_user.id, photo=b_photo, caption=f"Photo ID: {f_content_id}")
+                        content = download_content(f_url, proxies)
+                        await bot.send_photo(message.from_user.id, photo=content, caption=f"Photo ID: {f_content_id}")
+                    elif content_type == "video":
+                        content = download_content(f_url, proxies)
+                        return await bot.send_video(message.from_user.id,
+                                    InputFile(content, filename=f"Video ID: {f_content_id}"),
+                                    caption="Channel: @downloader_video")  # Return video with description.
             user = User.objects.get(user_id=message.from_user.id)
             download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
                                 service="instagram")
@@ -52,3 +51,13 @@ async def get_username(message: Message, state: FSMContext, n=0):
         return await message.answer("User is not found ☹️")
     except NetworkError:
         return await message.answer("Network error. Try again later ☹️")
+
+
+def download_content(url, proxies=None):
+    proxy_handler = urllib.request.ProxyHandler(proxies)
+    opener = urllib.request.build_opener(proxy_handler)
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    urllib.request.install_opener(opener)
+    content = urllib.request.urlopen(url).read()
+    b_content: BytesIO = BytesIO(content)
+    return b_content
