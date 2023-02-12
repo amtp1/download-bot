@@ -14,8 +14,7 @@ async def statistics(message: Message):
         download_count = sum(list(obj.download_count for obj in users)) + len(downloads)
         mail_markup = ReplyKeyboardMarkup(resize_keyboard=True,
                                           keyboard=[
-                                              [KeyboardButton(
-                                                  text="Conduct mailing")]
+                                              [KeyboardButton(text="Conduct mailing")]
                                           ])
         stat_page: str = (f"<b>Statistics</b>\n\n"
                           f"👤\n"

@@ -33,7 +33,6 @@ class InstagramDownloader:
     def stories(self):
         link = 'https://instastories.watch/api/profile/stories?username=%s' % self.username
         request = requests.get(url=link)
-        print(request.text)
         if request.status_code == 200:
             try:
                 response = request.text

@@ -15,7 +15,6 @@ from exceptions.exceptions import UserNotFound, NetworkError
 async def download(message: Message, state: FSMContext):
     await message.answer("Input username (Without @)👇")
     return await state.set_state('get_username')
-    # return await message.answer("Soon to the moon! In processing ...")
 
 
 @dp.message_handler(state='get_username')
@@ -35,16 +34,17 @@ async def get_username(message: Message, state: FSMContext, n=0):
                     f_content_id = content_id.split('-')[0]
                     if content_type == "photo":
                         content = download_content(f_url, proxies)
-                        await bot.send_photo(message.from_user.id, photo=content, caption=f"Photo ID: {f_content_id}")
+                        await bot.send_photo(message.from_user.id, photo=content,
+                                             caption=f"Photo ID: {f_content_id}\nChannel: @downloader_video")
                     elif content_type == "video":
                         content = download_content(f_url, proxies)
                         return await bot.send_video(message.from_user.id,
-                                    InputFile(content, filename=f"Video ID: {f_content_id}"),
-                                    caption="Channel: @downloader_video")  # Return video with description.
+                                    InputFile(content, filename=f_content_id),
+                                    caption="Video ID: {f_content_id}\n Channel: @downloader_video")  # Return video with description.
             user = User.objects.get(user_id=message.from_user.id)
             download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
                                 service="instagram")
-            download.save()
+            download.save() 
         elif stories == []:
             return await message.answer("Stories is not found ☹️")
     except UserNotFound:
