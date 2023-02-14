@@ -12,6 +12,10 @@ mongoengine = "*"
 requests = "*"
 python-dotenv = "*"
 pytube = "*"
+django = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+flask = "*"
 
 [dev-packages]
 
