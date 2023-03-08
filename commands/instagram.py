@@ -40,7 +40,7 @@ async def get_username(message: Message, state: FSMContext, n=0):
                         content = download_content(f_url, proxies)
                         return await bot.send_video(message.from_user.id,
                                     InputFile(content, filename=f_content_id),
-                                    caption="Video ID: {f_content_id}\n Channel: @downloader_video")  # Return video with description.
+                                    caption=f"Video ID: {f_content_id}\n Channel: @downloader_video")  # Return video with description.
             user = User.objects.get(user_id=message.from_user.id)
             download = Download(user=user, link=f"https://www.instagram.com/{username}", content_type="story",
                                 service="instagram")
