@@ -6,7 +6,6 @@ from models.mongo.models import *
 from models.mongo.models import Admins
 from models.mongo.models import DesktopSession
 
-
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
