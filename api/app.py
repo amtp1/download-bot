@@ -18,7 +18,7 @@ def users():
     for user in User.objects.all():
         user_download = Download.objects.filter(user=user)
         if user_download:
-            user.download_count + len(user_download.all())
+            user.download_count = user.download_count + len(user_download.all())
         users.append(user)
     return render_template('users.html', users=users, downloads=downloads)
 
