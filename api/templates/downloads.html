@@ -17,7 +17,7 @@
             <ul id="downloadsUl" class="list-group list-group-flush my-custom-scrollbar">
                 {% for download in downloads %}
                     <li class="list-group-item text-center">
-                        {{download.user_id}}
+                        <b>{{download.user_id}}</b>
                         <a href="{{download.link}}"><i class="bi bi-box-arrow-up-right"></i></a>
                         {% if download.content_type == 'video' %}
                             <i class="bi bi-file-earmark-play"></i>
@@ -31,6 +31,8 @@
                         {% elif download.service == 'instagram' %}
                             <i class="bi bi-instagram"></i>
                         {% endif %}
+                        <br>
+                        <small>{{download.created.strftime('%Y-%m-%d %H:%M:%S')}}</small>
                     </li>
                 {% endfor %}
             </ul>
