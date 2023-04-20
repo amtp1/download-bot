@@ -3,14 +3,14 @@ function searchUserById() {
     var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById('SearchUserInput');
     filter = input.value.toUpperCase();
-    table = document.getElementById('UsersTable');
+    table = document.getElementById('usersTable');
     tr = table.getElementsByTagName('tr');
   
     // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-      td_id = tr[i].getElementsByTagName("td")[0];
-      if (td_id){
-        txtValue = td_id.textContent || td_id.innerText;
+      th_id = tr[i].getElementsByTagName("th")[0];
+      if (th_id){
+        txtValue = th_id.textContent || th_id.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
           tr[i].style.display = "";
         } else {
@@ -26,13 +26,13 @@ function searchDownloadByUserId() {
   input = document.getElementById('SearchDownloadInput');
   filter = input.value.toUpperCase();
 
-  lg = $('#downloadsUl li')
+  lg = $('#downloadsUl tr')
 
   // Loop through all table rows, and hide those who don't match the search query
   for (i = 0; i < lg.length; i++) {
-    li = lg[i];
-    if (li){
-      txtValue = li.textContent || li.innerText;
+    tr = lg[i];
+    if (tr){
+      txtValue = tr.textContent || tr.innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
         lg[i].style.display = "";
       } else {
@@ -42,10 +42,14 @@ function searchDownloadByUserId() {
   }
 }
 
-function redirect_to_users(){
+function users(){
     window.location.replace('/users');
 }
 
-function redirect_to_downloads(){
+function downloads(){
   window.location.replace('/downloads');
+}
+
+function logout() {
+  window.location.replace('/logout')
 }
