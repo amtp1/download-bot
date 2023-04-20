@@ -4,35 +4,56 @@
 {% block body %}
 {% if users %}
 <p><div class="col-sm">
-  <p><input  type="text" id="SearchUserInput" onkeyup="searchUserById()" placeholder="Input User Id"></p>
+  <p><input  type="text" id="SearchUserInput" onkeyup="searchUserById()" placeholder="User ID"></p>
 </div>
 </p>
-<h3>Count users: {{users|length}}</h3>
-<div id="UsersTable" class="table-wrapper-scroll-y">
-    <table class="table table-sm">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">User Id</th>
-          <th scope="col">Username</th>
-          <th scope="col">First Name</th>
-          <th scope="col">Last Name</th>
-          <th scope="col" >Download Count</th>
-        </tr>
+<div class="relative overflow-x-auto">
+  <div id="usersTable" class="table-wrapper-scroll-y my-custom-scrollbar">
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+              <th scope="col" class="px-6 py-3">
+                User ID
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Username
+              </th>
+              <th scope="col" class="px-6 py-3">
+                First Name
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Last Name
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Download Count
+              </th>
+          </tr>
       </thead>
       <tbody>
         {% for user in users %}
-          <tr>
-            <td>{{user.user_id}}</td>
-            <td><strong>{{user.username}}</strong></td>
-            <td>{{user.first_name}}</td>
-            <td>{{user.last_name}}</td>
-            <td><strong>{{user.download_count}}</strong></td>
-          </tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {{user.user_id}}
+          </th>
+          <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            <strong>{{user.username}}</strong>
+          </th>
+          <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {{user.first_name}}
+          </th>
+          <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {{user.last_name}}
+          </th>
+          <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            <strong>{{user.download_count}}</strong>
+          </th>
+        </tr>
         {% endfor %}
       </tbody>
-    </table>
+  </table>
   </div>
-  {% else %}
+</div>
+{% else %}
     <h1>Пользователи не найдены</h1>
   {% endif %}
 {% endblock %}
