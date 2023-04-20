@@ -44,7 +44,6 @@ def downloads():
 @app.route('/auth', methods=['GET', 'POST'])
 def auth_user():
     if not session.get('logged_in'):
-        print(request.get_data())
         form = LoginForm()
         if form.validate_on_submit():
             email = request.form.get('email')
