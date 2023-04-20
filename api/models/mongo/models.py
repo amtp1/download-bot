@@ -70,3 +70,4 @@ class Admins(Document):
     email = StringField(max_length=255)
     password = StringField(max_length=255)
     date_joined = DateTimeField(default=dt.utcnow)
+    is_active = BooleanField()
