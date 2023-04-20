@@ -1,16 +1,30 @@
+from hashlib import md5
 from uuid import uuid4
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, redirect, request, session
+from flask_login import LoginManager, login_user, current_user
+from forms.LoginForm import LoginForm
 
 from models.mongo.models import *
-from models.mongo.models import Admins
-from models.mongo.models import DesktopSession
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+SECRET_KEY = str(uuid4())
+app.config['SECRET_KEY'] = SECRET_KEY
+
+@login_manager.user_loader
+def load_user(email, password):
+    password = md5(password.encode()).hexdigest()
+    return Admins.objects.get(email=email, password=password)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("index.html", content='Test')
+    if session.get('logged_in') == True:
+        return render_template("index.html", content='Test')
+    else:
+        return redirect('auth')
 
 @app.route('/users', methods=['GET'])
 def users():
@@ -26,6 +40,27 @@ def users():
 def downloads():
     downloads = [download.serialize() for download in Download.objects.all()]
     return render_template('downloads.html', downloads=downloads)
+
+@app.route('/auth', methods=['GET', 'POST'])
+def auth_user():
+    if not session.get('logged_in'):
+        print(request.get_data())
+        form = LoginForm()
+        if form.validate_on_submit():
+            email = request.form.get('email')
+            password = request.form.get('password')
+            user = load_user(email, password)
+            login_user(user)
+            session['logged_in'] = True
+            return redirect('/')
+        return render_template("auth.html", form=form)
+    else:
+        return redirect('/')
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session['logged_in'] = False
+    return redirect('/')
 
 @app.route('/api/v1/users', methods=['GET'])
 def get_users():
