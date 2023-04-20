@@ -1,6 +1,6 @@
 function searchUserById() {
     // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
+    let input, filter, table, tr, i, txtValue;
     input = document.getElementById('SearchUserInput');
     filter = input.value.toUpperCase();
     table = document.getElementById('usersTable');
@@ -22,7 +22,7 @@ function searchUserById() {
 
 function searchDownloadByUserId() {
   // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
+  let input, filter, tr, i, txtValue;
   input = document.getElementById('SearchDownloadInput');
   filter = input.value.toUpperCase();
 
@@ -52,4 +52,9 @@ function downloads(){
 
 function logout() {
   window.location.replace('/logout')
+}
+
+function reverse_users() {
+  let tbody = $('table tbody');
+  tbody.html($('tr',tbody).get().reverse());
 }
