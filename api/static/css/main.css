@@ -44,3 +44,15 @@
 .my-custom-scrollbar::-webkit-scrollbar-thumb{
   background-color: #000000;
 }
+
+#authForm {
+  margin-top: 10%;
+  margin-left: 35%;
+  width: 510px;
+}
+
+
+#authBtn {
+  width: 200px;
+  margin-left: 30%;
+}
