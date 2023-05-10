@@ -4,8 +4,6 @@ from pathlib import Path
 
 import yaml
 from loguru import logger
-from databases import Database
-from sqlalchemy import MetaData, create_engine
 from aiogram import Dispatcher, Bot
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
