@@ -1,13 +1,15 @@
 import copy
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import Message, KeyboardButton
+from aiogram.dispatcher.storage import FSMContext
 
 from models.mongo.models import *
 from objects.globals import dp, config
 from keyboards.keyboards import start_markup as START_MARKUP
 
 
-@dp.message_handler(commands="start")
-async def start(message: Message):
+@dp.message_handler(commands="start", state='*')
+async def start(message: Message, state: FSMContext):
+    await state.finish()
     # Get count user by user id. Must be always 1 user.
     user = User.objects(user_id=message.from_user.id).count()
     if not bool(user):
