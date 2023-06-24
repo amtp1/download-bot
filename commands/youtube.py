@@ -6,7 +6,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, C
 from aiogram.utils.exceptions import MessageNotModified
 from aiogram.dispatcher.storage import FSMContext
 from pytube import YouTube
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoUnavailable, RegexMatchError
 
 from objects.globals import dp, bot
 from keyboards.keyboards import stream_markup
@@ -86,7 +86,7 @@ async def download_video(query: CallbackQuery, state: FSMContext):
             streams_markup.add(InlineKeyboardButton(
                 text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
         return await query.message.answer("Select stream", reply_markup=streams_markup)
-    except VideoUnavailable:
+    except (VideoUnavailable, RegexMatchError):
         return await query.message.answer(text="Video unavailable!")
 
 
