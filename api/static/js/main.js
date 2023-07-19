@@ -46,14 +46,6 @@ function users(){
     window.location.replace('/users');
 }
 
-function downloads(){
-  window.location.replace('/downloads');
-}
-
-function logout() {
-  window.location.replace('/logout')
-}
-
 function reverse_users() {
   let tbody = $('table tbody');
   tbody.html($('tr',tbody).get().reverse());
