@@ -1,4 +1,5 @@
 import re
+import traceback
 import urllib.request
 from io import BytesIO
 
@@ -87,6 +88,7 @@ async def download_video(query: CallbackQuery, state: FSMContext):
                 text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
         return await query.message.answer("Select stream", reply_markup=streams_markup)
     except (VideoUnavailable, RegexMatchError):
+        traceback.print_exc()
         return await query.message.answer(text="Video unavailable!")
 
 

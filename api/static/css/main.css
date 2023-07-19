@@ -31,6 +31,10 @@
   height: 530px;
 }
 
+.table-wrapper-scroll-y {
+  display: block;
+}
+
 .my-custom-scrollbar {
   max-height: 88vh;
   overflow: auto;
@@ -45,14 +49,10 @@
   background-color: #000000;
 }
 
-#authForm {
-  margin-top: 10%;
-  margin-left: 35%;
-  width: 510px;
-}
-
-
-#authBtn {
-  width: 200px;
-  margin-left: 30%;
+.reverse-users-btn {
+  border-width: 1px;
+  border-radius: 5px;
+  width: 46px;
+  height: 46px;
+  background-color: white;
 }

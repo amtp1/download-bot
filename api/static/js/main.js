@@ -8,9 +8,9 @@ function searchUserById() {
   
     // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-      th_id = tr[i].getElementsByTagName("th")[0];
-      if (th_id){
-        txtValue = th_id.textContent || th_id.innerText;
+      td_id = tr[i].getElementsByTagName("td")[0];
+      if (td_id){
+        txtValue = td_id.textContent || td_id.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
           tr[i].style.display = "";
         } else {

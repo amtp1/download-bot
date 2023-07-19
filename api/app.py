@@ -2,7 +2,7 @@ from hashlib import md5
 from uuid import uuid4
 
 from flask import Flask, jsonify, render_template, redirect, request, session
-from flask_login import LoginManager, login_user, current_user
+from flask_login import LoginManager, login_user
 from forms.LoginForm import LoginForm
 
 from models.mongo.models import *
@@ -22,7 +22,9 @@ def load_user(email, password):
 @app.route('/', methods=['GET'])
 def index():
     if session.get('logged_in') == True:
-        return render_template("index.html", content='Test')
+        users = User.objects.all()
+        downloads = Download.objects.all()
+        return render_template("index.html", users=users, downloads=downloads)
     else:
         return redirect('auth')
 
