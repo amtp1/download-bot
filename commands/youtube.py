@@ -13,9 +13,11 @@ from objects.globals import dp, bot
 from keyboards.keyboards import stream_markup
 from utils.downloader.youtube import YoutubeDownloader
 from models.mongo.models import User, Download
+from utils.update.update import Update
 
 @dp.message_handler(lambda message: message.text == 'YouTube or YouTube Music', state='*')
 async def download(message: Message, state: FSMContext):
+    Update.update_user_data(message)
     await message.answer("Paste link👇")
     return await state.set_state('get_youtube_link')
 

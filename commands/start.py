@@ -4,6 +4,7 @@ from aiogram.dispatcher.storage import FSMContext
 
 from models.mongo.models import *
 from objects.globals import dp, config
+from utils.update.update import Update
 from keyboards.keyboards import start_markup as START_MARKUP
 
 
@@ -16,6 +17,7 @@ async def start(message: Message, state: FSMContext):
         user = User(user_id=message.from_user.id, username=message.from_user.username,
                     first_name=message.from_user.first_name, last_name=message.from_user.last_name)
         user.save()
+    Update.update_user_data(message)
     start_markup = copy.deepcopy(START_MARKUP)
     if config.get("ADMIN_ID") == message.from_user.id:
         start_markup.add(KeyboardButton("Conduct mailing"))
