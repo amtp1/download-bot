@@ -1,4 +1,5 @@
 import re
+import copy
 import traceback
 import urllib.request
 from io import BytesIO
@@ -10,7 +11,7 @@ from pytube import YouTube
 from pytube.exceptions import VideoUnavailable, RegexMatchError
 
 from objects.globals import dp, bot
-from keyboards.keyboards import stream_markup
+from keyboards.keyboards import stream_markup, start_markup as START_MARKUP
 from utils.downloader.youtube import YoutubeDownloader
 from models.mongo.models import User, Download
 from utils.update.update import Update
@@ -66,10 +67,11 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
         download = Download(user=user, link=content_data.get("url"), content_type="audio", service="youtube")
         download.save()
 
+        start_markup = copy.deepcopy(START_MARKUP)
         return await bot.send_audio(user_id,
                                     InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
                                     caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-                                    f"Channel: @downloader_video")  # Return audio with description.
+                                    f"Channel: @downloader_video", reply_markup=start_markup)  # Return audio with description.
 
 
 @dp.callback_query_handler(lambda query: query.data == "video")
@@ -120,7 +122,8 @@ async def download_by_select_stream(query: CallbackQuery, state: FSMContext):
         download = Download(user=user, link=content_data.get("url"), content_type="video", service="youtube")
         download.save()
 
+        start_markup = copy.deepcopy(START_MARKUP)
         return await bot.send_video(user_id,
                                     InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
                                     caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-                                    f"Channel: @downloader_video")  # Return video with description.
+                                    f"Channel: @downloader_video", reply_markup=start_markup)  # Return video with description.
