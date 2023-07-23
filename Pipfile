@@ -18,6 +18,7 @@ django-cors-headers = "*"
 flask = "*"
 flask-login = "*"
 flask-wtf = "*"
+flake8 = "*"
 
 [dev-packages]
 
