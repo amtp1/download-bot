@@ -1,11 +1,11 @@
 import re
 import copy
-import traceback
 import urllib.request
 from io import BytesIO
 
+from loguru import logger
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputFile
-from aiogram.utils.exceptions import MessageNotModified
+from aiogram.utils.exceptions import MessageNotModified, BotBlocked
 from aiogram.dispatcher.storage import FSMContext
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable, RegexMatchError
@@ -15,6 +15,7 @@ from keyboards.keyboards import stream_markup, start_markup as START_MARKUP
 from utils.downloader.youtube import YoutubeDownloader
 from models.mongo.models import User, Download
 from utils.update.update import Update
+
 
 @dp.message_handler(lambda message: message.text == 'YouTube or YouTube Music', state='*')
 async def download(message: Message, state: FSMContext):
@@ -55,7 +56,7 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
         try:
             await bot.edit_message_text(chat_id=user_id, message_id=msg_id,
                                         text="⏳Downloading best audio. Please, wait.\n"
-                                         "⚠️If the file size is large, the download will take longer.")
+                                             "⚠️If the file size is large, the download will take longer.")
         except MessageNotModified:
             pass
         # Read audio content.
@@ -68,10 +69,13 @@ async def download_audio(query: CallbackQuery, state: FSMContext):
         download.save()
 
         start_markup = copy.deepcopy(START_MARKUP)
-        return await bot.send_audio(user_id,
-                                    InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
-                                    caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-                                    f"Channel: @downloader_video", reply_markup=start_markup)  # Return audio with description.
+        try:
+            return await bot.send_audio(
+                user_id, InputFile(bytes_audio, filename=f"{response.author} - {response.title}"),
+                caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
+                f"Channel: @downloader_video", reply_markup=start_markup)
+        except BotBlocked as e:
+            return logger.error(e)
 
 
 @dp.callback_query_handler(lambda query: query.data == "video")
@@ -92,7 +96,6 @@ async def download_video(query: CallbackQuery, state: FSMContext):
                 text=f"{stream.resolution} - {stream.fps}fps", callback_data=f"stream#{stream.itag}"))
         return await query.message.answer("Select stream", reply_markup=streams_markup)
     except (VideoUnavailable, RegexMatchError):
-        traceback.print_exc()
         return await query.message.answer(text="Video unavailable!")
 
 
@@ -123,7 +126,10 @@ async def download_by_select_stream(query: CallbackQuery, state: FSMContext):
         download.save()
 
         start_markup = copy.deepcopy(START_MARKUP)
-        return await bot.send_video(user_id,
-                                    InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
-                                    caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
-                                    f"Channel: @downloader_video", reply_markup=start_markup)  # Return video with description.
+        try:
+            return await bot.send_video(
+                user_id, InputFile(bytes_video, filename=f"{response.author} - {response.title}"),
+                caption=f"✅ <b>{response.author}</b> - {response.title}\n\n"
+                f"Channel: @downloader_video", reply_markup=start_markup)
+        except BotBlocked as e:
+            return logger.error(e)
