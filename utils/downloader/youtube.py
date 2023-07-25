@@ -2,7 +2,8 @@ import traceback
 from dataclasses import dataclass
 
 from pytube import YouTube
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoUnavailable, AgeRestrictedError
+
 
 @dataclass
 class ContentMeta:
@@ -19,6 +20,7 @@ class ContentMeta:
         self.stream = stream
         self.author = author
         self.title = title
+
 
 class YoutubeDownloader:
     @staticmethod
@@ -37,7 +39,7 @@ class YoutubeDownloader:
         else:
             try:
                 stream = yt.streams.get_by_itag(itag)
-            except VideoUnavailable as e:
+            except (VideoUnavailable, AgeRestrictedError) as e:
                 return ContentMeta(is_error=True, message=e)
             except Exception as e:
                 traceback.print_exc()
